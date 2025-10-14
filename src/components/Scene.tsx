@@ -70,9 +70,9 @@ export function Scene() {
         />
 
         {/* Rounded rectangles positioned behind the gate model */}
-        <RoundedRectangle position={[-6, 4, -600]} />
-        <RoundedRectangle position={[0, 4, -600]} />
-        <RoundedRectangle position={[6, 4, -600]} />
+        <RoundedRectangle position={[-6, 4, -610]} />
+        <RoundedRectangle position={[0, 4, -610]} /> 
+        <RoundedRectangle position={[6, 4, -610]} />
 
         {/* Gate model */}
 
