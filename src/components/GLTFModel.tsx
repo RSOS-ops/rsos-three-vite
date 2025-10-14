@@ -1,45 +1,39 @@
 import { useRef, useEffect, useState } from 'react';
 import { useGLTF, useAnimations } from '@react-three/drei';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import gsap from 'gsap';
 
 interface GLTFModelProps {
   modelPath: string;
   position?: [number, number, number];
   scale?: [number, number, number];
+  onAnimationComplete?: () => void;
 }
 
 export function GLTFModel({ 
   modelPath, 
   position = [0, -3.5, -5], 
-  scale = [10, 10, 10] 
+  scale = [10, 10, 10],
+  onAnimationComplete
 }: GLTFModelProps) {
   const group = useRef<THREE.Group>(null);
   const { scene, animations } = useGLTF(modelPath);
   const { mixer, actions } = useAnimations(animations, group);
-  const { camera } = useThree();
   const [animationPlayed, setAnimationPlayed] = useState(false);
-  const [flyAnimationStarted, setFlyAnimationStarted] = useState(false);
+  const [animationCompleted, setAnimationCompleted] = useState(false);
 
   // Update the mixer on each frame and check if animation is complete
   useFrame((_, delta) => {
     if (mixer) {
       mixer.update(delta);
       // Check if the embedded animation has finished
-      if (animationPlayed && !flyAnimationStarted && actions && Object.keys(actions).length > 0) {
+      if (animationPlayed && !animationCompleted && actions && Object.keys(actions).length > 0) {
         const firstAction = Object.values(actions)[0];
         if (firstAction && !firstAction.isRunning()) {
-          setFlyAnimationStarted(true);
-          setTimeout(() => {
-            // Move camera forward to position just behind the gate model
-            // Gate is at z=-5, so move camera to z=-7 (2 units behind it)
-            gsap.to(camera.position, {
-              z: -7,
-              duration: 1.5,
-              ease: "power2.inOut"
-            });
-          }, 500); // 0.5 second pause
+          setAnimationCompleted(true);
+          if (onAnimationComplete) {
+            onAnimationComplete();
+          }
         }
       }
     }

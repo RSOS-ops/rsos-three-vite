@@ -3,12 +3,45 @@ import { OrbitControls } from '@react-three/drei';
 import { RoundedRectangle } from './RoundedRectangle';
 import { GLTFModel } from './GLTFModel';
 import { PostProcessing } from './PostProcessing';
+import { GridFloor } from './GridFloor';
+
+
+import { useState } from 'react';
+import { CameraAnimator } from './CameraAnimator';
 
 export function Scene() {
-  console.log('Scene component rendering...');
-  
+  const [controlsEnabled, setControlsEnabled] = useState(false);
+  const [flyCamera, setFlyCamera] = useState(false);
+
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
+    <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+      {/* Lock/Unlock Camera Button */}
+      <button
+        onClick={() => setControlsEnabled((v) => !v)}
+        style={{
+          position: 'absolute',
+          top: 24,
+          right: 24,
+          width: 48,
+          height: 48,
+          borderRadius: '50%',
+          background: '#fff',
+          color: '#222',
+          border: 'none',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+          cursor: 'pointer',
+          zIndex: 10,
+          fontSize: 24,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          transition: 'background 0.2s',
+        }}
+        title={controlsEnabled ? 'Lock Camera' : 'Unlock Camera'}
+        aria-label={controlsEnabled ? 'Lock Camera' : 'Unlock Camera'}
+      >
+        {controlsEnabled ? '🔓' : '🔒'}
+      </button>
       <Canvas
         camera={{ 
           position: [0, 0, 5], 
@@ -28,7 +61,7 @@ export function Scene() {
 
         {/* Smooth camera controls */}
         <OrbitControls 
-          enabled={false}
+          enabled={controlsEnabled}
           enableDamping={true}
           dampingFactor={0.05}
           screenSpacePanning={false}
@@ -37,52 +70,42 @@ export function Scene() {
         />
 
         {/* Rounded rectangles positioned behind the gate model */}
-        <RoundedRectangle position={[-6, 4, -30]} />
-        <RoundedRectangle position={[0, 4, -30]} />
-        <RoundedRectangle position={[6, 4, -30]} />
+        <RoundedRectangle position={[-6, 4, -600]} />
+        <RoundedRectangle position={[0, 4, -600]} />
+        <RoundedRectangle position={[6, 4, -600]} />
 
         {/* Gate model */}
+
         <GLTFModel 
           modelPath="/models/gate-animated-2-emissive.glb"
           position={[0, -3.5, -5]}
           scale={[10, 10, 10]}
+          onAnimationComplete={() => {
+            setTimeout(() => setFlyCamera(true), 500);
+          }}
         />
 
-        {/* Clean grid floor - horizontal and vertical lines only */}
-        <group position={[0, -5, 0]}>
-          {/* Horizontal lines */}
-          {Array.from({ length: 201 }, (_, i) => {
-            const z = (i - 100) * 2;
-            return (
-              <mesh key={`h-${i}`} position={[0, 0, z]}>
-                <boxGeometry args={[8, 0.02, 0.02]} />
-                <meshStandardMaterial 
-                  color={"#6287f8"}
-                  emissive={"#6287f8"}
-                  emissiveIntensity={4.5}
-                  transparent
-                  opacity={0.7}
-                />
-              </mesh>
-            );
-          })}
-          {/* Vertical lines */}
-          {Array.from({ length: 5 }, (_, i) => {
-            const x = (i - 2) * 2;
-            return (
-              <mesh key={`v-${i}`} position={[x, 0, 0]}>
-                <boxGeometry args={[0.02, 0.02, 400]} />
-                <meshStandardMaterial 
-                  color={0xce02d4}
-                  emissive={0xce02d4}
-                  emissiveIntensity={4.5}
-                  transparent
-                  opacity={0.7}
-                />
-              </mesh>
-            );
-          })}
-        </group>
+        {/* Camera fly animation after gate animation completes */}
+        <CameraAnimator
+          targetPosition={[0, 0, -590]}
+          duration={1.5}
+          delay={0}
+          trigger={flyCamera}
+        />
+
+        {/* Grid floor - reusable component with configurable dimensions */}
+        <GridFloor 
+          position={[0, -5, 0]}
+          width={8}
+          length={590}
+          gridSpacing={2}
+          horizontalLineColor="#6287f8"
+          verticalLineColor={0xce02d4}
+          horizontalEmissiveIntensity={4.5}
+          verticalEmissiveIntensity={4.5}
+          opacity={0.7}
+          lineThickness={0.02}
+        />
 
         {/* Post-processing effects */}
         <PostProcessing />
