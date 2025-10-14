@@ -1,0 +1,2 @@
+// This script loads the GLTFLoader for Three.js
+// Source: https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js
