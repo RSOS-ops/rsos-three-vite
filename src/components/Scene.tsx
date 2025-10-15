@@ -88,11 +88,12 @@ export function Scene() {
 
         {/* Wizard model with looping animation */}
         <GLTFModel
-          modelPath="/models/Wiz_MagicStandingIdle_1.glb"
+          modelPath="/models/Wiz-ComboAnims.glb"
           position={[0, -5, -600]}
           scale={[5, 5, 5]}
           loopAnimation={true}
           timeScale={0.333}
+          animationName="wiz.idle"
         />
 
         {/* Camera fly animation after gate animation completes */}
