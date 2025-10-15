@@ -10,6 +10,7 @@ interface RoundedRectangleProps {
   fillColor?: THREE.ColorRepresentation;
   edgeColor?: THREE.ColorRepresentation;
   emissiveIntensity?: number;
+  onClick?: () => void;
 }
 
 export function RoundedRectangle({
@@ -21,6 +22,7 @@ export function RoundedRectangle({
   fillColor = 0x000000,
   edgeColor = "#ff6327",
   emissiveIntensity = 4.5,
+  onClick,
 }: RoundedRectangleProps) {
   
   // Create the rounded rectangle path
@@ -62,7 +64,13 @@ export function RoundedRectangle({
   return (
     <group position={position}>
       {/* Fill rectangle */}
-      <mesh geometry={rectGeometry}>
+      <mesh 
+        geometry={rectGeometry}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick?.();
+        }}
+      >
         <meshBasicMaterial 
           color={fillColor} 
           transparent 

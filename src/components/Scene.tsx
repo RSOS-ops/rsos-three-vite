@@ -4,14 +4,21 @@ import { RoundedRectangle } from './RoundedRectangle';
 import { GLTFModel } from './GLTFModel';
 import { PostProcessing } from './PostProcessing';
 import { GridFloor } from './GridFloor';
+import { WizardAnimationController } from './WizardAnimationController';
 
-
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { CameraAnimator } from './CameraAnimator';
 
 export function Scene() {
   const [controlsEnabled, setControlsEnabled] = useState(false);
   const [flyCamera, setFlyCamera] = useState(false);
+  const wizardRef = useRef<any>(null);
+
+  const handleRectangleClick = () => {
+    if (wizardRef.current?.playAttackAnimation) {
+      wizardRef.current.playAttackAnimation();
+    }
+  };
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
@@ -70,9 +77,9 @@ export function Scene() {
         />
 
         {/* Rounded rectangles positioned behind the gate model */}
-        <RoundedRectangle position={[-19, 8, -610]} />
-        <RoundedRectangle position={[0, 8, -610]} /> 
-        <RoundedRectangle position={[19, 8, -610]} />
+        <RoundedRectangle position={[-19, 8, -610]} onClick={handleRectangleClick} />
+        <RoundedRectangle position={[0, 8, -610]} onClick={handleRectangleClick} /> 
+        <RoundedRectangle position={[19, 8, -610]} onClick={handleRectangleClick} />
 
         {/* Gate model */}
 
@@ -87,13 +94,14 @@ export function Scene() {
         />
 
         {/* Wizard model with looping animation */}
-        <GLTFModel
+        <WizardAnimationController
+          ref={wizardRef}
           modelPath="/models/Wiz-ComboAnims.glb"
           position={[0, -5, -600]}
           scale={[5, 5, 5]}
-          loopAnimation={true}
+          idleAnimationName="wiz.idle"
+          attackAnimationName="wiz.attackUnder"
           timeScale={0.333}
-          animationName="wiz.idle"
         />
 
         {/* Camera fly animation after gate animation completes */}
