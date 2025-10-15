@@ -28,7 +28,6 @@ export function Scene() {
 
         {/* Smooth camera controls */}
         <OrbitControls 
-          enabled={false}
           enableDamping={true}
           dampingFactor={0.05}
           screenSpacePanning={false}
