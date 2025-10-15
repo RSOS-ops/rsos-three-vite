@@ -70,9 +70,9 @@ export function Scene() {
         />
 
         {/* Rounded rectangles positioned behind the gate model */}
-        <RoundedRectangle position={[-6, 4, -610]} />
-        <RoundedRectangle position={[0, 4, -610]} /> 
-        <RoundedRectangle position={[6, 4, -610]} />
+        <RoundedRectangle position={[-19, 8, -610]} />
+        <RoundedRectangle position={[0, 8, -610]} /> 
+        <RoundedRectangle position={[19, 8, -610]} />
 
         {/* Gate model */}
 
@@ -83,6 +83,15 @@ export function Scene() {
           onAnimationComplete={() => {
             setTimeout(() => setFlyCamera(true), 500);
           }}
+        />
+
+        {/* Wizard model with looping animation */}
+        <GLTFModel
+          modelPath="/models/Wiz_MagicStandingIdle_1.glb"
+          position={[0, -5, -600]}
+          scale={[5, 5, 5]}
+          loopAnimation={true}
+          timeScale={0.333}
         />
 
         {/* Camera fly animation after gate animation completes */}

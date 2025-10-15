@@ -14,9 +14,9 @@ interface RoundedRectangleProps {
 
 export function RoundedRectangle({
   position,
-  width = 5,
-  height = 3,
-  cornerRadius = 0.3,
+  width = 15,
+  height = 7.5,
+  cornerRadius = 1.1,
   tubeRadius = 0.05,
   fillColor = 0x000000,
   edgeColor = "#ff6327",

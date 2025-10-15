@@ -8,13 +8,17 @@ interface GLTFModelProps {
   position?: [number, number, number];
   scale?: [number, number, number];
   onAnimationComplete?: () => void;
+  loopAnimation?: boolean;
+  timeScale?: number;
 }
 
 export function GLTFModel({ 
   modelPath, 
   position = [0, -3.5, -5], 
   scale = [10, 10, 10],
-  onAnimationComplete
+  onAnimationComplete,
+  loopAnimation = false,
+  timeScale = 1
 }: GLTFModelProps) {
   const group = useRef<THREE.Group>(null);
   const { scene, animations } = useGLTF(modelPath);
@@ -39,23 +43,26 @@ export function GLTFModel({
     }
   });
 
-  // Set up click handler to play animation once
+  // Always play the first animation automatically if available
   useEffect(() => {
-    const handleClick = () => {
-      if (!animationPlayed && actions && Object.keys(actions).length > 0) {
-        const firstAction = Object.values(actions)[0];
-        if (firstAction) {
+    if (actions && Object.keys(actions).length > 0) {
+      const firstAction = Object.values(actions)[0];
+      if (firstAction) {
+        firstAction.timeScale = timeScale;
+        firstAction.reset();
+        if (loopAnimation) {
+          firstAction.setLoop(THREE.LoopRepeat, Infinity);
+          firstAction.clampWhenFinished = false;
+        } else {
           firstAction.setLoop(THREE.LoopOnce, 1);
           firstAction.clampWhenFinished = true;
-          firstAction.play();
-          setAnimationPlayed(true);
         }
+        firstAction.play();
+        setAnimationPlayed(true);
       }
-    };
-
-    window.addEventListener('click', handleClick);
-    return () => window.removeEventListener('click', handleClick);
-  }, [actions, animationPlayed]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [actions, loopAnimation, timeScale]);
 
   // Log material types for debugging (similar to original code)
   useEffect(() => {
@@ -77,7 +84,7 @@ export function GLTFModel({
   }, [scene]);
 
   return (
-    <group ref={group} position={position} scale={scale}>
+    <group ref={group} position={position} scale={scale} rotation={[0, Math.PI, 0]}>
       <primitive object={scene} />
     </group>
   );
