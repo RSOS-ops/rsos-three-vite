@@ -10,6 +10,7 @@ interface GLTFModelProps {
   onAnimationComplete?: () => void;
   loopAnimation?: boolean;
   timeScale?: number;
+  autoPlay?: boolean;
 }
 
 export function GLTFModel({ 
@@ -18,7 +19,8 @@ export function GLTFModel({
   scale = [10, 10, 10],
   onAnimationComplete,
   loopAnimation = false,
-  timeScale = 1
+  timeScale = 1,
+  autoPlay = true
 }: GLTFModelProps) {
   const group = useRef<THREE.Group>(null);
   const { scene, animations } = useGLTF(modelPath);
@@ -43,9 +45,9 @@ export function GLTFModel({
     }
   });
 
-  // Always play the first animation automatically if available
+  // Play animation automatically if autoPlay is true, otherwise wait for click
   useEffect(() => {
-    if (actions && Object.keys(actions).length > 0) {
+    if (actions && Object.keys(actions).length > 0 && !animationPlayed) {
       const firstAction = Object.values(actions)[0];
       if (firstAction) {
         firstAction.timeScale = timeScale;
@@ -57,12 +59,25 @@ export function GLTFModel({
           firstAction.setLoop(THREE.LoopOnce, 1);
           firstAction.clampWhenFinished = true;
         }
-        firstAction.play();
-        setAnimationPlayed(true);
+        
+        if (autoPlay) {
+          firstAction.play();
+          setAnimationPlayed(true);
+        } else {
+          // Wait for click to play
+          const handleClick = () => {
+            if (!animationPlayed) {
+              firstAction.play();
+              setAnimationPlayed(true);
+            }
+          };
+          window.addEventListener('click', handleClick);
+          return () => window.removeEventListener('click', handleClick);
+        }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actions, loopAnimation, timeScale]);
+  }, [actions, loopAnimation, timeScale, autoPlay, animationPlayed]);
 
   // Log material types for debugging (similar to original code)
   useEffect(() => {

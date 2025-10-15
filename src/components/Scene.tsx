@@ -80,6 +80,7 @@ export function Scene() {
           modelPath="/models/gate-animated-2-emissive.glb"
           position={[0, -3.5, -5]}
           scale={[10, 10, 10]}
+          autoPlay={false}
           onAnimationComplete={() => {
             setTimeout(() => setFlyCamera(true), 500);
           }}
